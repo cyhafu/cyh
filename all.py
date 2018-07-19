@@ -215,7 +215,7 @@ def GetTemp():
         try:
             #print("\n---------------------------\n")
             print("GetTemp is running...")
-            time.sleep(2)
+            time.sleep(4)
             humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
             if humidity is not None and temperature is not None:
                 #print 'Temp={0:0.1f}*C  Humidity={1:0.1f}%'.format(temperature, humidity)
@@ -237,7 +237,7 @@ def GetGPS():
             try:
                 #print("\n---------------------------\n")
                 print("GetGPS is running...")
-                time.sleep(2)
+                time.sleep(4)
                 #print 'latitude    ' , gpsd.fix.latitude
                 #print 'longitude   ' , gpsd.fix.longitude
                 #print 'time utc    ' , gpsd.utc,' + ', gpsd.fix.time
@@ -284,10 +284,11 @@ def GetBlueTooth():
 def GetAndSendAllData():
     global temp, hum, lat, lng
     i = 0
+    time.sleep(10)
     
     while True:
         try:
-            time.sleep(10)
+            time.sleep(8)
             
             jsonobj['lat'] = repr(lat)
             jsonobj['lng'] = repr(lng)
@@ -320,8 +321,10 @@ def GetAndSendAllData():
 #GetTemp();
 #GetGPS();
 #GetBlueTooth();
-
 print("Geting Start...")
+print('open Bluetooth device')
+subprocess.call(['systemctl', 'start', 'hciuart'])
+
 for i in range(0,10):
     print(".")
     time.sleep(1)
