@@ -160,18 +160,30 @@ class Bluetoothctl:
             success = True if res == 1 else False
             return success
 
+jsonobj = {}
 
-if __name__ == "__main__":
+while True :
 
-    print("Init bluetooth...")
-    bl = Bluetoothctl()
-    print("Ready!")
-    bl.remove("12:3B:6A:1A:FE:4A")
-    bl.start_scan()
-    print("Scanning for 10 seconds...")
-    for i in range(0, 10):
-        print(i)
-        time.sleep(1)
+    if __name__ == "__main__":
 
-    print(bl.get_discoverable_devices())
+        for i in range(0, len(jsonobj)) :
+            bl.remove(jsonobj[i]['mac_address'])
+            print ('removed {}'.format(jsonobj[i]['mac_address']))
+
+        print ('----- Done Remove -----')
+            
+        jsonobj = {}
+        print("Init bluetooth...")
+        bl = Bluetoothctl()
+        print("Ready!")
+        bl.start_scan()
+        print("Scanning for 15 seconds...")
+        for i in range(0, 15):
+            print(i)
+            time.sleep(1)
+
+        jsonobj = bl.get_discoverable_devices()
+        print('@@@ now have {} @@@'.format(str(len(jsonobj))))
+        print(jsonobj)    
+        
 
