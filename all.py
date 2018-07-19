@@ -233,8 +233,12 @@ def GetTemp():
 def GetGPS():
     
         gpsp.start()
+        count = 0
         while True:
             try:
+                if count >= 10:
+                    subprocess.call(['sudo', 'killall', 'gpsd'])
+                    count = 0
                 #print("\n---------------------------\n")
                 print("GetGPS is running...")
                 time.sleep(4)
@@ -245,8 +249,11 @@ def GetGPS():
                 global lng
                 lat = gpsd.fix.latitude
                 lng = gpsd.fix.longitude
+                if lat == "nan" or lng == "nan" :
+                    count = count + 1
             except : 
                 print "Something wrong in GetGPS()!!!"
+                count = count + 1
                 
 
 def GetBlueTooth():
