@@ -16,12 +16,20 @@ import requests
 #server & db
 import json
 import requests
+#gps distance
+from math import radians, cos, sin, asin, sqrt
+#sms
+import commands
+#date time
+import datetime  
 
 
 temp = -1
 hum = -1
 lat = -99
 lng = -99
+lat2 = -99
+lng2 = -99
 jsonobj = {}
 
 
@@ -208,7 +216,28 @@ class GpsPoller(threading.Thread):
 if __name__ == '__main__':
         gpsp = GpsPoller()
 #------------------------------------------------
-    
+
+
+def haversine(lon1, lat1, lon2, lat2):
+    """
+    Calculate the great circle distance between two points 
+    on the earth (specified in decimal degrees)
+    """
+    # convert decimal degrees to radians 
+    lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
+    # haversine formula 
+    dlon = lon2 - lon1 
+    dlat = lat2 - lat1 
+    a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+    c = 2 * asin(sqrt(a)) 
+    # Radius of earth in kilometers is 6371
+    km = 6371* c
+    return km
+
+
+def sendsms(message, target):
+    commandString = 'sudo gammu sendsms TEXT '+target+' -textutf8 "'+message+'"'
+    print commands.getoutput(commandString)
 
 def GetTemp():
     while True:
@@ -234,6 +263,7 @@ def GetGPS():
     
         gpsp.start()
         count = 0
+        gpsCount = 0
         while True:
             try:
                 if count >= 10:
@@ -245,12 +275,23 @@ def GetGPS():
                 #print 'latitude    ' , gpsd.fix.latitude
                 #print 'longitude   ' , gpsd.fix.longitude
                 #print 'time utc    ' , gpsd.utc,' + ', gpsd.fix.time
-                global lat
-                global lng
-                lat = gpsd.fix.latitude
-                lng = gpsd.fix.longitude
+                global lat, lat2
+                global lng, lng2
+                if gpsCount == 0:
+                    lat = gpsd.fix.latitude
+                    lng = gpsd.fix.longitude
+                    lat2 = gpsd.fix.latitude
+                    lng2 = gpsd.fix.longitude
+                else:
+                    lat2 = lat
+                    lng2 = lng 
+                    lat = gpsd.fix.latitude
+                    lng = gpsd.fix.longitude
+                
                 if lat == "nan" or lng == "nan" :
                     count = count + 1
+
+                gpsCount = gpsCount+1
             except : 
                 print "Something wrong in GetGPS()!!!"
                 count = count + 1
@@ -281,31 +322,83 @@ def GetBlueTooth():
           watchobj = bl.get_discoverable_devices()
           print('@@@ now have {} @@@'.format(str(len(watchobj))))
           #print(watchobj)
-          jsonobj['Watch'] = watchobj
+          
+          for i in range(0, len(watchobj)):
+              print "###########info############"
+              print watchobj[i]['mac_address']
+              ss = str(bl.get_device_info(watchobj[i]['mac_address']))
+              #print ss
+              pos = ss.find("R")
+              #print ("pos is {}".format(str(pos)))
+              rr = ss[pos:(pos+9)]
+              print rr
+              xx = rr.split(' ', 1 )
+              print xx[1]
+              watchobj[i]['rssi'] = xx[1]
+              print watchobj[i]
+              
+          jsonobj['watch'] = watchobj
+          #print jsonobj['watch']
+          #s="mystring"
+          #s[4:10]
           #print('obj')
           #print(jsonobj)
+          
+          print "========================================="
+
     except:
       print "Something wrong in GetBlueTooth()!!!"
       
 
 def GetAndSendAllData():
-    global temp, hum, lat, lng
+    global temp, hum, lat, lng, lat2, lng2
     i = 0
+    timeCheckCount = 0
     time.sleep(10)
     
     while True:
         try:
             time.sleep(8)
-            
+            #38 times to check 3 options mean is "kid stuck in car"
+            #have to send sms to parent and driver
+            #print ("temp : {}".format(temp))
+            #print ("lat : {}".format(lat))
+            #print ("lng : {}".format(lng))
+            #print ("lat2 : {}".format(lat2))
+            #print ("lng2 : {}".format(lng2))
+            print ("distance : {}".format(haversine(lng, lat, lng2, lat2)*1000))
+            if temp>=20 and (haversine(lng, lat, lng2, lat2)*1000)<=20:
+                timeCheckCount = timeCheckCount+1
+                print ("now ms: {}".format((timeCheckCount+1)*8))
+            else:
+                timeCheckCount = 0
+
+            if timeCheckCount >= 38 :
+                print "Help!!!"
+                sendsms("hi dad come help me right now, I don't have must time xD!", "+66952586024")
+
+            #date time
+            dt = str(datetime.datetime.now())
+            d = dt.split(' ', 1 )
+            s = list(d[0])
+            s[4] = '/'
+            s[7] = '/'
+            dd = "".join(s)
+            tt = d[1][:8]
+            jsonobj['date'] = dd
+            jsonobj['time'] = tt
             jsonobj['lat'] = repr(lat)
+            jsonobj['id'] = 'car001'
             jsonobj['lng'] = repr(lng)
             jsonobj['temp'] = repr(temp)
             jsonobj['hum'] = repr(hum)
+            
             
             #print("Temp : {}".format(temp))
             #print("Hum : {}".format(hum))
             #print("lat : {}".format(lat))
             #print("lng : {}".format(lng))
+            
             print("# {} ".format(i+1))
             print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n")
             print("JsonObj : {}".format(jsonobj))
@@ -316,14 +409,12 @@ def GetAndSendAllData():
             print("\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n")
             #bAddrs = []
             i = i+1
+            timeCheckCount = timeCheckCount+1
         except:
             print("Something wrong in GetAndSendAllData()!!!")
 
-            
-        
 
 
-    
 
 #GetTemp();
 #GetGPS();
@@ -347,17 +438,3 @@ t1.start()
 t2.start()
 t3.start()
 t4.start()
-
-
-
-
-
-
-
-
-
-
-
-
-    
-    
