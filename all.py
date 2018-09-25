@@ -32,6 +32,7 @@ lat2 = -99
 lng2 = -99
 jsonobj = {}
 watchArray = []
+valueInWatchArray = []
 
 
 #===============bluetooth class==========================================
@@ -219,11 +220,13 @@ if __name__ == '__main__':
 #------------------------------------------------
 
 def GetWatchMacAddr():
+    global watchArray
     print "GetWatchMacAddr ..."
-    r = requests.get('https://kiddatabase.herokuapp.com/getbandincar')
-    print "json is :"
-    print r.json()
-
+    r = requests.get("https://kiddatabase.herokuapp.com/getbandincar")
+    data = r.json()
+    watchArray = data[0]['watch']
+    print watchArray
+    
 
 def haversine(lon1, lat1, lon2, lat2):
     """
