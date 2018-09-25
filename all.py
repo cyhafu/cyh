@@ -224,26 +224,46 @@ if __name__ == '__main__':
         gpsp = GpsPoller()
 #------------------------------------------------
 
-def isHaveinWatchArray(_1watchCheck):
-    global watchArray
-    for x in range(len(watchArray)):
+def isHaveinWatchFound(watchFounds, _1watchInArray):
+    for x in range(len(watchFounds)):
        # print "============="
         #print "check btw :"
         #print _1watchCheck
         #print watchArray[x]
         #print "============="
-        if _1watchCheck == watchArray[x]: 
-            return True
-    return False
+        if _1watchInArray == watchFounds[x]: 
+            return x
+    return -1
 
 def CountUpForNotFoundWatch(watchFounds):
     global watchArray
-    for x in range(len(watchFounds)):
-        if isHaveinWatchArray(watchFounds[x]):
+    for x in range(len(watchArray)):
+        index = isHaveinWatchFound(watchFounds, watchArray[x])
+        print "index is : "
+        print index
+        if index != -1:
             print "============="
-            print "found "
-            print watchFounds[x]
+            print "found in index "
+            print x
+            print watchArray[x]
+            valueInWatchArray[x] = 0
+            print "now value is : "
+            print valueInWatchArray
             print "============="
+        else:
+            print "============="
+            print "not found in index "
+            print watchArray[x]
+            valueInWatchArray[x] = valueInWatchArray[x]+1
+            print "now value is : "
+            print valueInWatchArray
+            print "============="
+            
+            
+            if valueInWatchArray[index] >= 38:
+                #out of car
+                print "out of car"
+            
 
 def GetWatchMacAddr():
     global watchArray
@@ -257,8 +277,9 @@ def GetWatchMacAddr():
         
     print "len of watchArray is : "
     print len(watchArray)
+    print "data of watchArray is : "
     print watchArray
-    print "value is : "
+    print "valueCount is : "
     print valueInWatchArray
     
 
@@ -470,7 +491,7 @@ print("Geting Start...")
 print('open Bluetooth device')
 subprocess.call(['systemctl', 'start', 'hciuart'])
 GetWatchMacAddr()
-w = ["F4:A7:65:7B:B7:62", "D8:2A:9A:6F:SA:52"]
+w = ["D8:A1:C6:AA:7D:E6", "D8:2A:9A:6F:SA:52"]
 CountUpForNotFoundWatch(w)
 
 for i in range(0,10):
