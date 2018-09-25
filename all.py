@@ -31,6 +31,7 @@ lng = -99
 lat2 = -99
 lng2 = -99
 jsonobj = {}
+watchArray = []
 
 
 #===============bluetooth class==========================================
@@ -216,6 +217,12 @@ class GpsPoller(threading.Thread):
 if __name__ == '__main__':
         gpsp = GpsPoller()
 #------------------------------------------------
+
+def GetWatchMacAddr():
+    print "GetWatchMacAddr ..."
+    r = requests.get('https://kiddatabase.herokuapp.com/getbandincar')
+    print "json is :"
+    print r.json()
 
 
 def haversine(lon1, lat1, lon2, lat2):
@@ -425,6 +432,7 @@ def GetAndSendAllData():
 print("Geting Start...")
 print('open Bluetooth device')
 subprocess.call(['systemctl', 'start', 'hciuart'])
+GetWatchMacAddr()
 
 for i in range(0,10):
     print(".")
