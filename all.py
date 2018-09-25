@@ -31,8 +31,13 @@ lng = -99
 lat2 = -99
 lng2 = -99
 jsonobj = {}
+
+#for check student is out of car
 watchArray = []
-valueInWatchArray = []
+valueInWatchArray = [] #0=>78++
+lat_1stMeetWatchArray = []
+lng_1stMeetWatchArray = []
+
 
 
 #===============bluetooth class==========================================
@@ -219,13 +224,42 @@ if __name__ == '__main__':
         gpsp = GpsPoller()
 #------------------------------------------------
 
+def isHaveinWatchArray(_1watchCheck):
+    global watchArray
+    for x in range(len(watchArray)):
+       # print "============="
+        #print "check btw :"
+        #print _1watchCheck
+        #print watchArray[x]
+        #print "============="
+        if _1watchCheck == watchArray[x]: 
+            return True
+    return False
+
+def CountUpForNotFoundWatch(watchFounds):
+    global watchArray
+    for x in range(len(watchFounds)):
+        if isHaveinWatchArray(watchFounds[x]):
+            print "============="
+            print "found "
+            print watchFounds[x]
+            print "============="
+
 def GetWatchMacAddr():
     global watchArray
     print "GetWatchMacAddr ..."
     r = requests.get("https://kiddatabase.herokuapp.com/getbandincar")
     data = r.json()
-    watchArray = data[0]['watch']
+    for x in range(len(data[0]['watch'])):
+        #print data[0]['watch'][x]['mac_address']
+        watchArray.append(data[0]['watch'][x]['mac_address'])
+        valueInWatchArray.append(0)
+        
+    print "len of watchArray is : "
+    print len(watchArray)
     print watchArray
+    print "value is : "
+    print valueInWatchArray
     
 
 def haversine(lon1, lat1, lon2, lat2):
@@ -436,6 +470,8 @@ print("Geting Start...")
 print('open Bluetooth device')
 subprocess.call(['systemctl', 'start', 'hciuart'])
 GetWatchMacAddr()
+w = ["F4:A7:65:7B:B7:62", "D8:2A:9A:6F:SA:52"]
+CountUpForNotFoundWatch(w)
 
 for i in range(0,10):
     print(".")
