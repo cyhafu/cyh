@@ -366,16 +366,19 @@ def GetAndSendAllData():
             #print ("lng : {}".format(lng))
             #print ("lat2 : {}".format(lat2))
             #print ("lng2 : {}".format(lng2))
+
+            #!!!!!! stuck in the van !!!!!!!
             print ("distance : {}".format(haversine(lng, lat, lng2, lat2)*1000))
-            if temp>=20 and (haversine(lng, lat, lng2, lat2)*1000)<=20:
+            if temp>=27 and (haversine(lng, lat, lng2, lat2)*1000)<=20:
                 timeCheckCount = timeCheckCount+1
                 print ("now ms: {}".format((timeCheckCount+1)*8))
             else:
                 timeCheckCount = 0
 
-            if timeCheckCount >= 38 :
+            if timeCheckCount >= 76 :
                 print "Help!!!"
                 sendsms("hi dad come help me right now, I don't have must time xD!", "+66952586024")
+            #=====!!!!!! end stuck in the van !!!!!!=====
 
             #date time
             dt = str(datetime.datetime.now())
