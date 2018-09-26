@@ -316,20 +316,19 @@ def GetWatchMacAddr():
     url2 = "https://kiddatabase.herokuapp.com/getalluser-location-incar/"+carTabain
     r2 = requests.get(url2)
     data2 = r2.json()
-    print "######### GetWatchMacAddr() #########"
-    print "data2 is : "
-    print data2
-    print "len data2 is "
-    print len(data2)
+    #print "######### GetWatchMacAddr() #########"
+    #print "data2 is : "
+    #print data2
+    #print "len data2 is "
+    #print len(data2)
 
     for y in range(len(watchArray)):
         for x in range(len(data2)):
             if data2[x]['mac_address'] == watchArray[y]:
-                school_latArray[y] = 1
-                school_lngArray[y] = 1
-                home_latArray[y] = 1
-                home_lngArray[y] = 1
-                print "zzZ"
+                school_latArray[y] = data2[x]['schoolLocation']['lat']
+                school_lngArray[y] = data2[x]['schoolLocation']['lng']
+                home_latArray[y] = data2[x]['homeLocation']['lat']
+                home_lngArray[y] = data2[x]['homeLocation']['lng']
             elif school_latArray[y] == -99.99:
                 school_latArray[y] = -99.99
                 school_lngArray[y] = -99.99
