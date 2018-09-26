@@ -23,7 +23,7 @@ import commands
 #date time
 import datetime  
 
-
+carTabain = 'ele001'
 temp = -1
 hum = -1
 lat = -99
@@ -37,6 +37,12 @@ watchArray = []
 valueInWatchArray = [] #0=>78++
 lat_1stMeetWatchArray = []
 lng_1stMeetWatchArray = []
+
+#for keep location from student band
+school_latArray = []
+school_lngArray = []
+home_latArray = []
+home_lngArray = []
 
 
 
@@ -277,16 +283,22 @@ def CountUpForNotFoundWatch(watchFounds):
             
 
 def GetWatchMacAddr():
-    global watchArray
+    global watchArray, carTabain, school_latArray, school_lngArray, home_latArray, home_lngArray
+    
     print "GetWatchMacAddr ..."
-    r = requests.get("https://kiddatabase.herokuapp.com/getbandincar")
+    url = "https://kiddatabase.herokuapp.com/getbandincar/"+carTabain
+    r = requests.get(url)
     data = r.json()
-    for x in range(len(data[0]['watch'])):
-        #print data[0]['watch'][x]['mac_address']
-        watchArray.append(data[0]['watch'][x]['mac_address'])
+    for x in range(len(data['watch'])):
+        #print data['watch'][x]['mac_address']
+        watchArray.append(data['watch'][x]['mac_address'])
         valueInWatchArray.append(0)
         lat_1stMeetWatchArray.append(-99.99)
-        lng_1stMeetWatchArray.append(-99.99) 
+        lng_1stMeetWatchArray.append(-99.99)
+        school_latArray.append(-99.99)
+        school_lngArray.append(-99.99)
+        home_latArray.append(-99.99)
+        home_lngArray.append(-99.99)
 
     print "######### GetWatchMacAddr() #########"
     print "len of watchArray is : "
@@ -300,6 +312,44 @@ def GetWatchMacAddr():
     print "lng is :"
     print lng_1stMeetWatchArray
     print "#####################################"
+
+    url2 = "https://kiddatabase.herokuapp.com/getalluser-location-incar/"+carTabain
+    r2 = requests.get(url2)
+    data2 = r2.json()
+    print "######### GetWatchMacAddr() #########"
+    print "data2 is : "
+    print data2
+    print "len data2 is "
+    print len(data2)
+
+    for y in range(len(watchArray)):
+        for x in range(len(data2)):  
+            if data2[x]['mac_address'] == watchArray[y]:
+                school_latArray[y] = 1
+                school_lngArray[y] = 1
+                home_latArray[y] = 1
+                home_lngArray[y] = 1
+                print "zzZ"
+            else:
+                school_latArray[y] = -99.99
+                school_lngArray[y] = -99.99
+                home_latArray[y] = -99.99
+                home_lngArray[y] = -99.99
+                    
+    
+    print "#####################################"
+    print "school_latArray : "
+    print school_latArray
+    print "school_lngArray : "
+    print school_lngArray
+    print "-------------------------------------"
+    print "home_latArray : "
+    print home_latArray
+    print "school_lngArray : "
+    print home_lngArray
+    print "#####################################"
+
+    
     
 
 def haversine(lon1, lat1, lon2, lat2):
