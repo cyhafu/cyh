@@ -258,8 +258,10 @@ def CountUpForNotFoundWatch(watchFounds):
             print "============="
             #save curLocation when 1st found will know where bands are disappear
             global lat, lng
+            
             lat_1stMeetWatchArray[x] = lat
             lng_1stMeetWatchArray[x] = lng
+            
             
             
         else:
@@ -272,7 +274,7 @@ def CountUpForNotFoundWatch(watchFounds):
             print "============="
             
             
-            if valueInWatchArray[x] >= 10:
+            if valueInWatchArray[x] >= 5 and lat_1stMeetWatchArray[x]!=-99.99:
                 #out of car
                 print "%%%%%%%%%%%%% out of car %%%%%%%%%%%%%%"
                 print watchArray[x]
@@ -280,15 +282,23 @@ def CountUpForNotFoundWatch(watchFounds):
                 #if below lat, lng is stay close on home or school location USER
                     #alert ishome, isschool
                 
-                if (haversine(float(lng_1stMeetWatchArray[x]), float(lat_1stMeetWatchArray[x], school_lngArray[x], school_latArray[x])) <= 30):
-                    print "is close school"
-                elif (haversine(float(lng_1stMeetWatchArray[x]), float(lat_1stMeetWatchArray[x], home_lngArray[x], home_latArray[x])) <= 30):
-                    print "is close home"
+                #if (haversine(float(lng_1stMeetWatchArray[x]), float(lat_1stMeetWatchArray[x], school_lngArray[x], school_latArray[x])) <= 30):
+                #    print "??????? is close school ?????????"
+                #elif (haversine(float(lng_1stMeetWatchArray[x]), float(lat_1stMeetWatchArray[x], home_lngArray[x], home_latArray[x])) <= 30):
+                #    print "???????  is close home ??????? "
                     
-                print "lat : ".format(lat_1stMeetWatchArray[x])
-                print "lng : ".format(lng_1stMeetWatchArray[x])
-                print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
-            
+                print "lat : "
+                print lat_1stMeetWatchArray[x]
+                print "lng : "
+                print lng_1stMeetWatchArray[x]
+
+                dt = haversine(float(lng_1stMeetWatchArray[x]), float(lat_1stMeetWatchArray[x]), float(school_lngArray[x]), float(school_latArray[x]))
+                if float(dt) <= 30 :
+                    print "************** in school **************"
+
+                dt2 = haversine(float(lng_1stMeetWatchArray[x]), float(lat_1stMeetWatchArray[x]), float(home_lngArray[x]), float(home_latArray[x]))
+                if float(dt2) <= 30 :
+                    print "************** in home **************"
 
             
 
@@ -375,6 +385,8 @@ def haversine(lon1, lat1, lon2, lat2):
     c = 2 * asin(sqrt(a)) 
     # Radius of earth in kilometers is 6371
     km = 6371* c
+    print "dddistance is :"
+    print km
     return km
 
 
@@ -523,7 +535,7 @@ def GetAndSendAllData():
             #print ("lng2 : {}".format(lng2))
 
             #!!!!!! stuck in the van !!!!!!!
-            print ("distance : {}".format(haversine(lng, lat, lng2, lat2)*1000))
+            print ("Check stuck in car distance : {}".format(haversine(lng, lat, lng2, lat2)*1000))
             if temp>=27 and (haversine(lng, lat, lng2, lat2)*1000)<=20:
                 timeCheckCount = timeCheckCount+1
                 print ("now ms: {}".format((timeCheckCount+1)*8))
