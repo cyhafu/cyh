@@ -277,9 +277,19 @@ def CountUpForNotFoundWatch(watchFounds):
                 print "%%%%%%%%%%%%% out of car %%%%%%%%%%%%%%"
                 print watchArray[x]
                 print "on location"
+                #if below lat, lng is stay close on home or school location USER
+                    #alert ishome, isschool
+                
+                if (haversine(float(lng_1stMeetWatchArray[x]), float(lat_1stMeetWatchArray[x], school_lngArray[x], school_latArray[x])) <= 30):
+                    print "is close school"
+                elif (haversine(float(lng_1stMeetWatchArray[x]), float(lat_1stMeetWatchArray[x], home_lngArray[x], home_latArray[x])) <= 30):
+                    print "is close home"
+                    
                 print "lat : ".format(lat_1stMeetWatchArray[x])
                 print "lng : ".format(lng_1stMeetWatchArray[x])
                 print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+            
+
             
 
 def GetWatchMacAddr():
