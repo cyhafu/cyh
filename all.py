@@ -250,6 +250,12 @@ def CountUpForNotFoundWatch(watchFounds):
             print "now value is : "
             print valueInWatchArray
             print "============="
+            #save curLocation when 1st found will know where bands are disappear
+            global lat, lng
+            lat_1stMeetWatchArray[x] = lat
+            lng_1stMeetWatchArray[x] = lng
+            
+            
         else:
             print "============="
             print "not found in index "
@@ -260,9 +266,14 @@ def CountUpForNotFoundWatch(watchFounds):
             print "============="
             
             
-            if valueInWatchArray[index] >= 38:
+            if valueInWatchArray[x] >= 10:
                 #out of car
-                print "out of car"
+                print "%%%%%%%%%%%%% out of car %%%%%%%%%%%%%%"
+                print watchArray[x]
+                print "on location"
+                print "lat : ".format(lat_1stMeetWatchArray[x])
+                print "lng : ".format(lng_1stMeetWatchArray[x])
+                print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
             
 
 def GetWatchMacAddr():
@@ -274,13 +285,21 @@ def GetWatchMacAddr():
         #print data[0]['watch'][x]['mac_address']
         watchArray.append(data[0]['watch'][x]['mac_address'])
         valueInWatchArray.append(0)
-        
+        lat_1stMeetWatchArray.append(-99.99)
+        lng_1stMeetWatchArray.append(-99.99) 
+
+    print "######### GetWatchMacAddr() #########"
     print "len of watchArray is : "
     print len(watchArray)
     print "data of watchArray is : "
     print watchArray
     print "valueCount is : "
     print valueInWatchArray
+    print "lat is :"
+    print lat_1stMeetWatchArray
+    print "lng is :"
+    print lng_1stMeetWatchArray
+    print "#####################################"
     
 
 def haversine(lon1, lat1, lon2, lat2):
@@ -387,10 +406,16 @@ def GetBlueTooth():
           watchobj = bl.get_discoverable_devices()
           print('@@@ now have {} @@@'.format(str(len(watchobj))))
           #print(watchobj)
+
+          WatchArrayFoundPerSearch = []
+          print "$$$$$$$$$$$$$$$$$$$$$$$$$$"
+          print "before perfound is : "
+          print WatchArrayFoundPerSearch
           
           for i in range(0, len(watchobj)):
               print "###########info############"
               print watchobj[i]['mac_address']
+              WatchArrayFoundPerSearch.append(watchobj[i]['mac_address'])
               ss = str(bl.get_device_info(watchobj[i]['mac_address']))
               #print ss
               pos = ss.find("R")
@@ -401,6 +426,12 @@ def GetBlueTooth():
               print xx[1]
               watchobj[i]['rssi'] = xx[1]
               print watchobj[i]
+
+          print "+++++++++++++++++++++++"
+          print "Per Found is : "
+          print WatchArrayFoundPerSearch
+          print "+++++++++++++++++++++++"
+          CountUpForNotFoundWatch(WatchArrayFoundPerSearch)
               
           jsonobj['watch'] = watchobj
           #print jsonobj['watch']
@@ -490,9 +521,7 @@ def GetAndSendAllData():
 print("Geting Start...")
 print('open Bluetooth device')
 subprocess.call(['systemctl', 'start', 'hciuart'])
-GetWatchMacAddr()
-w = ["D8:A1:C6:AA:7D:E6", "D8:2A:9A:6F:SA:52"]
-CountUpForNotFoundWatch(w)
+GetWatchMacAddr() 
 
 for i in range(0,10):
     print(".")
